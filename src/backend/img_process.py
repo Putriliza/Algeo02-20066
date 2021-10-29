@@ -1,38 +1,17 @@
 from PIL import Image
-from numpy import array
+from numpy import asarray, ma
 from numpy import uint8
-from numpy.core.fromnumeric import squeeze
 from numpy.lib.shape_base import dstack
+from numpy import diag
 
 def img_to_matrix(image):
-
     im_1 = Image.open(rf"{image}")
-    imageAr = array(im_1)
-
-    width = im_1.size[0]
-    height = im_1.size[1]
-
+    imageAr = asarray(im_1)
     imgType = len(imageAr[0][0])
     buffer = []
-    # buffer = [[],[],[]]
-    # for i in range(height):
-    #     rm, gm, bm = [],[],[]
-    #     for j in range(width):
-    #         rgba = imageAr[i][j]
-    #         r,g,b = rgba
-    #         rm.append(r)
-    #         gm.append(g)
-    #         bm.append(b)
-    #     buffer[0].append(rm)
-    #     buffer[1].append(gm)
-    #     buffer[2].append(bm)
-        
-    imageAr = imageAr.transpose(2,0,1).reshape(3,-1)
-    for i in range(len(imageAr)):
-        a = squeeze(imageAr[i])
-        a = a.reshape(height, width)
-        buffer.append(a)
-    return buffer[:imgType]
+    for i in range(imgType):
+        buffer.append(imageAr[:,:,i])
+    return buffer
 
 def compress_matrix(matrix_svd, diff):
     rank = len(matrix_svd[1][0])
@@ -48,17 +27,6 @@ def svd_to_matrix(matrix_svd):
 
 def matrix_to_img(buffer, filename):
     imgType = len(buffer)
-    # height = len(buffer[0])
-    # width = len(buffer[0][0])
-
-    # imgAr = [[[0 for _ in range(imgType)] for _ in range(width)] for _ in range(height)]
-
-    # for i in range(height):
-    #     for j in range(width):
-    #         for k in range(imgType):
-    #             imgAr[i][j][k] = buffer[k][i][j]
-
-    # data = Image.fromarray(uint8(imgAr))
     data = Image.fromarray(uint8(dstack(buffer)))
 
     type = ""
@@ -67,20 +35,42 @@ def matrix_to_img(buffer, filename):
     elif imgType == 3:
         type = ".jpg"
 
-    data.save("./img_output/" + filename + type)
+    data.save("./img_output/" + filename + type, bitmap_format="png")
+
+def mask_png(buffer, mask):
+    newBuffer = []
+    for i in range(len(buffer)):
+        mask_array = mask[i]                
+        png_arr = buffer[i]
+
+        m = ma.masked_where(mask_array==0, mask_array, copy=False)
+        png_arr = ma.masked_where(ma.getmask(m), png_arr, copy=False)
+        png_arr = png_arr.filled(0)
+        png_arr = png_arr.astype(uint8)
+        newBuffer.append(png_arr)
+    return newBuffer
 
 
 #Testing Proses kompresi JPG
-buffer = img_to_matrix("../../test/aaaaa.jpg")
-# r,g,b = buffer
+# buffer = img_to_matrix("../../test/wal.png")
+# r,g,b,a = buffer
 
-# ratio=50
-# r = compress_matrix(svd(r), ratio)
-# g = compress_matrix(svd(g), ratio)
-# b = compress_matrix(svd(b), ratio)
+# ratio=99
 
-# r = svd_to_matrix(r)
-# g = svd_to_matrix(g)
-# b = svd_to_matrix(b)
-# buffer = [r,g,b]
-matrix_to_img(buffer, "jova")
+# ru,rs,rv=svd(r)
+# gu,gs,gv=svd(g)
+# bu,bs,bv=svd(b)
+
+# new_r = compress_matrix([ru, diag(rs), rv], ratio)
+# new_g = compress_matrix([gu, diag(gs), gv], ratio)
+# new_b = compress_matrix([bu, diag(bs), bv], ratio)
+
+# new_r = svd_to_matrix(new_r)
+# new_g = svd_to_matrix(new_g)
+# new_b = svd_to_matrix(new_b)
+
+# buffer = mask_png([new_r, new_g, new_b],[r,g,b])
+
+# buffer.append(a)
+
+# matrix_to_img(buffer, "jova")
