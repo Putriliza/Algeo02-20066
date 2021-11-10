@@ -1,12 +1,11 @@
 from PIL import Image
-from numpy import asarray, ma
+from numpy import asarray, ma, clip
 from numpy import uint8
 from numpy.lib.shape_base import dstack
-from numpy.lib.twodim_base import diag
-from numpy.linalg import svd
 from base64 import b64decode, b64encode
 from io import BytesIO
-
+from SVD import getSVD
+from time import time
 
 def img_to_matrix(image, mode):
     imageAr = asarray(image)
@@ -79,21 +78,22 @@ def compress_image(b64Img: str, ratio: int):
     new_buffer = []
 
     if mode == "RGB" or mode == "L":
-        print("AA")
         img_type = "JPEG"
         for color in buffer:
-            u, s, vt = svd(color)
-            new_color = compress_matrix([u, diag(s), vt], ratio)
+            u, s, vt = getSVD(color)
+            new_color = compress_matrix([u, s, vt], ratio)
             new_color = svd_to_matrix(new_color)
+            clip(new_color, 0, 255, out=new_color)
             new_buffer.append(new_color)
         img = matrix_to_img(new_buffer, original_mode)
 
     elif mode == "RGBA" or mode == "LA":
         img_type = "PNG"
         for color in buffer[:-1]:
-            u, s, vt = svd(color)
-            new_color = compress_matrix([u, diag(s), vt], ratio)
+            u, s, vt = getSVD(color)
+            new_color = compress_matrix([u, s, vt], ratio)
             new_color = svd_to_matrix(new_color)
+            clip(new_color, 0, 255, out=new_color)
             new_buffer.append(new_color)
         new_buffer = mask_png(new_buffer, buffer[:-1])
         new_buffer.append(buffer[-1])
