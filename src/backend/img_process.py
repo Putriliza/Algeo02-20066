@@ -5,10 +5,9 @@ from numpy.lib.shape_base import dstack
 from base64 import b64decode, b64encode
 from io import BytesIO
 from SVD import getSVD
-from time import time
 
 def img_to_matrix(image, mode):
-    imageAr = asarray(image)
+    imageAr = asarray(image).astype(int)
 
     if mode == "L" or mode == "P":
         return [imageAr]

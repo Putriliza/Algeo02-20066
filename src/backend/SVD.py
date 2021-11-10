@@ -14,6 +14,7 @@ def getLambdaUV(m):   # m sudah harus matriks simetris
 def getSigma(m, lamda):
     new_lamda = lamda.copy()
     np.absolute(new_lamda, out=new_lamda)
+    np.clip(new_lamda, 1e-10, np.inf, out=new_lamda)
     sigma = np.sqrt(new_lamda[:min(m.shape)])
     return np.diag(sigma)
 
