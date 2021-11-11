@@ -6,7 +6,7 @@
       <div class="file-input-container">
         <input @change="uploadImage"
                type="file"
-               accept="image/jpeg, image/png"
+               accept="image/jpeg, image/png, image/bmp, image/webp"
                class="sm-input-file"
                id="sm-ip-1"/>
         <div class="input-wrapper">
@@ -35,8 +35,17 @@
     <Output
         v-bind:img-name="imgName"
         v-bind:img-result="imgResult"
-        v-bind:ratio="rate"
+        v-bind:diff="diff"
         v-bind:time="time"/>
+    <transition name="fade" appear>
+      <div class="modal-overlay" v-if="showModal" @click="showModal = false"></div>
+    </transition>
+    <transition name="pop" appear>
+      <div class="modal" role="dialog" v-if="showModal">
+        <h3>Error</h3>
+        <p>{{ message }}</p>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -55,12 +64,15 @@ export default {
   },
   data() {
     return {
+      diff: 0,
       imgData: "",
       imgName: null,
       imgResult: "",
       isLoading: false,
+      message: "",
       time: 0,
-      rate: 0
+      rate: 0,
+      showModal: false,
     }
   },
   methods: {
@@ -79,22 +91,20 @@ export default {
       this.isLoading = true;
       axios.post("http://localhost:5000/api/compress", {image: this.imgData, ratio: this.rate})
           .then(res => {
-            this.imgResult = res.data.image;
-            this.time = res.data.time;
             this.isLoading = false;
+            if (res.data.success) {
+              this.imgResult = res.data.image;
+              this.time = res.data.time;
+              this.diff =  res.data.diff;
+            } else {
+              this.showModal = true;
+              this.message = res.data.message;
+            }
           })
           .catch(err => {
             console.log("Error: " + err.message);
           });
     },
-    downloadImage() {
-      let a = document.createElement("a");
-      let originalName = this.imgName.split(".");
-      let newName = originalName[0] + " (compressed)." + originalName[1];
-      a.href = this.imgResult;
-      a.download = newName
-      a.click();
-    }
   },
   watch: {
     rate: {
@@ -286,5 +296,40 @@ input::-webkit-inner-spin-button {
   100% {
     transform: rotate(360deg);
   }
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin: auto;
+  text-align: center;
+  width: 50vw;
+  height: fit-content;
+  max-width: 22em;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.2);
+  background: #FFF;
+  z-index: 999;
+  transform: none;
+}
+.modal h3 {
+  color: #2c3e50;
+}
+.modal p {
+  color: #2c3e50;
+}
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 998;
+  background: #2c3e50;
+  opacity: 0.6;
 }
 </style>

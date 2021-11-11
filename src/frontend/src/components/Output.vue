@@ -1,7 +1,7 @@
 <template>
   <div class="output">
     <div class="stat">
-      <p>Image pixel difference percentage: <b>{{ ratio }}</b> %</p>
+      <p>Image pixel difference percentage: <b>{{ diff }}</b>%</p>
       <p>Image compression time: <b>{{ time }}</b> seconds</p>
     </div>
     <div class="download">
@@ -19,16 +19,17 @@
 export default {
   name: "Output",
   props: {
+    diff: Number,
     imgName: String,
     imgResult: String,
-    ratio: Number,
     time: Number
   },
   methods: {
     downloadImage() {
       let a = document.createElement("a");
       let originalName = this.imgName.split(".");
-      let newName = originalName[0] + " (compressed)." + originalName[1];
+      let extension = originalName.pop();
+      let newName = originalName.join('.') + " (compressed)." + extension;
       a.href = this.imgResult;
       a.download = newName
       a.click();

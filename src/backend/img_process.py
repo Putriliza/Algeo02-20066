@@ -1,5 +1,5 @@
 from PIL import Image
-from numpy import asarray, ma, clip
+from numpy import absolute, asarray, ma, clip
 from numpy import uint8
 from numpy.lib.shape_base import dstack
 from base64 import b64decode, b64encode
@@ -60,17 +60,28 @@ def mask_png(buffer, mask):
     return newBuffer
 
 
+def pixel_difference(imageA, imageB):
+    im1 = asarray(imageA.convert("L")).astype(int)
+    im2 = asarray(imageB.convert("L")).astype(int)
+    diff = absolute(im1 - im2)
+    err = (diff > 2).sum()
+    same = (diff <= 2).sum()
+    err_percentage = (err / (err + same)) * 100
+    return round(err_percentage, 2)
+
+
 def compress_image(b64Img: str, ratio: int):
     image = b64decode(b64Img)
-    image = Image.open(BytesIO(image))
-    original_mode = image.mode
+    original_image = Image.open(BytesIO(image))
+    original_mode = original_image.mode
     if original_mode == "P":
-        image = image.convert("RGBA")
+        image = original_image.convert("RGBA")
         mode = image.mode
     elif original_mode == "CMYK":
-        image = image.convert("RGB")
+        image = original_image.convert("RGB")
         mode = image.mode
     else:
+        image = original_image
         mode = original_mode
 
     buffer = img_to_matrix(image, mode)
@@ -101,4 +112,5 @@ def compress_image(b64Img: str, ratio: int):
     image_buffer = BytesIO()
     img.save(image_buffer, format=img_type)
     img_str = b64encode(image_buffer.getvalue())
-    return img_str
+    diff = pixel_difference(original_image, img)
+    return img_str, diff

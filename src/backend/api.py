@@ -23,10 +23,21 @@ class Test(Resource):
         image_base64 = image_body[1]
 
         t1 = time()
-        img_str = compress_image(image_base64, compress_ratio)
+        try:
+            img_str, diff = compress_image(image_base64, compress_ratio)
+        except:
+            img_str, diff = "err", 0
         t2 = time()
 
-        return {
-            'image': image_mime + "," + img_str.decode("utf-8"),
-            'time': round(t2 - t1, 2)
+        if img_str == "err":
+            return {
+                'success': False,
+                'message': "An error occurred!"
+            }
+        else:
+            return {
+                'success': True,
+                'image': image_mime + "," + img_str.decode("utf-8"),
+                'diff': diff,
+                'time': round(t2 - t1, 2)
             }
