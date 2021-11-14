@@ -1,30 +1,29 @@
 import numpy as np
 from numpy.linalg import qr
 
-def getLambdaUV(m):   # m sudah harus matriks simetris
+def getLambdaUV(m, n_iter):   # m sudah harus matriks simetris
     n = len(m)
     mVector = np.identity(n)
-    for _ in range(0, 1):
+    for _ in range(0, n_iter):
         q, r = qr(m)
-        mVector = np.matmul(mVector, q)
-        m = np.matmul(r, q)
+        mVector = mVector @ q
+        m = r @ q
     lamda = np.diag(m, k=0)
     return lamda, mVector
 
 def getSigma(m, lamda):
     new_lamda = lamda.copy()
-    np.absolute(new_lamda, out=new_lamda)
     np.clip(new_lamda, 1e-10, np.inf, out=new_lamda)
     sigma = np.sqrt(new_lamda[:min(m.shape)])
     return np.diag(sigma)
 
-def getSVD(m: np.ndarray) :
+def getSVD(m, n_iter) :
     height, width = m.shape
     min_s = min(height, width)
     if width >= height:
-        lamda1, U = getLambdaUV(m @ m.T)
+        lamda1, U = getLambdaUV(m @ m.T, n_iter)
     elif width < height:
-        lamda1, VT = getLambdaUV(m.T @ m)
+        lamda1, VT = getLambdaUV(m.T @ m, n_iter)
     
     S = getSigma(m, lamda1)
     if width >= height:

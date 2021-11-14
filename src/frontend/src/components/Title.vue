@@ -47,7 +47,7 @@ export default {
 
 .title h1 span:hover {
   transition: 0.25s ease-out 0s;
-  font-size: 1.25em;
+  color: #09c7e8;
 }
 
 .hl {

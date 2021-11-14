@@ -6,6 +6,13 @@ from base64 import b64decode, b64encode
 from io import BytesIO
 from SVD import getSVD
 
+def get_iter(ratio):
+    if ratio > 40:
+        return (ratio - 30) // 10
+    else:
+        return 1
+
+
 def img_to_matrix(image, mode):
     imageAr = asarray(image).astype(int)
 
@@ -65,12 +72,13 @@ def pixel_difference(imageA, imageB):
     im2 = asarray(imageB.convert("L")).astype(int)
     diff = absolute(im1 - im2)
     err = (diff > 2).sum()
-    same = (diff <= 2).sum()
-    err_percentage = (err / (err + same)) * 100
+    total = im1.shape[0] * im2.shape[1]
+    err_percentage = (err / total) * 100
     return round(err_percentage, 2)
 
 
-def compress_image(b64Img: str, ratio: int):
+def compress_image(b64Img, ratio):
+    n_iter = get_iter(ratio)
     image = b64decode(b64Img)
     original_image = Image.open(BytesIO(image))
     original_mode = original_image.mode
@@ -90,7 +98,7 @@ def compress_image(b64Img: str, ratio: int):
     if mode == "RGB" or mode == "L":
         img_type = "JPEG"
         for color in buffer:
-            u, s, vt = getSVD(color)
+            u, s, vt = getSVD(color, n_iter)
             new_color = compress_matrix([u, s, vt], ratio)
             new_color = svd_to_matrix(new_color)
             clip(new_color, 0, 255, out=new_color)
@@ -100,7 +108,7 @@ def compress_image(b64Img: str, ratio: int):
     elif mode == "RGBA" or mode == "LA":
         img_type = "PNG"
         for color in buffer[:-1]:
-            u, s, vt = getSVD(color)
+            u, s, vt = getSVD(color, n_iter)
             new_color = compress_matrix([u, s, vt], ratio)
             new_color = svd_to_matrix(new_color)
             clip(new_color, 0, 255, out=new_color)

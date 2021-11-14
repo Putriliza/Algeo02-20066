@@ -58,12 +58,22 @@ export default {
 
 .btn-dl {
   cursor: pointer;
+  background-color: #222831;
+  color: #ea40ad;
+  font-weight: bold;
   font-family: Glory, sans-serif;
   font-size: 1em;
   height: 3em;
   width: 6em;
-  border: transparent;
+  border: 2px solid #ea40ad;
   border-radius: 0.5em;
+  transition: .2s ease-in;
+}
+
+.btn-dl:hover {
+  background-color: #e254ae;
+  color: #f3f3f3;
+  transform: translate(2px, 2px)
 }
 
 @media only screen and (max-width: 600px) {

@@ -209,6 +209,11 @@ body {
   width: 2em;
   height: 1.75em;
   margin: 0.5em 0.5em;
+  border: 1px solid #ea40ad;
+  background: #222831;
+  color: #fff;
+  font-weight: bold;
+  text-align: center;
 }
 
 input::-webkit-outer-spin-button,
@@ -228,10 +233,21 @@ input::-webkit-inner-spin-button {
   font-family: Glory, sans-serif;
   font-size: 1em;
   border-radius: 0.5em;
-  height: 2em;
+  background-color: #222831;
+  color: #ea40ad;
+  font-weight: bold;
+  margin-top: 8px;
+  height: 2.5em;
   width: 5em;
-  border: transparent;
+  border: 2px solid #ea40ad;
   cursor: pointer;
+  transition: .2s ease-in;
+}
+
+.compress:hover {
+  background-color: #e254ae;
+  color: #f3f3f3;
+  transform: translateY(2px)
 }
 
 @media only screen and (max-width: 1280px) {
@@ -274,7 +290,7 @@ input::-webkit-inner-spin-button {
   height: 40px;
   border: 8px solid #f3f3f3;
   border-radius: 50%;
-  border-top: 8px solid #3498db;
+  border-top: 8px solid #09c7e8;
   -webkit-animation: spin 2s linear infinite;
   animation: spin 2s linear infinite;
   margin-top: 2em;
