@@ -9,6 +9,11 @@ Kelompok algeogeogeo:
 | 13520072  | Jova Andres Riski Sirait |
 | 13520084  | Adelline Kania Setiyawan |
 
+```
+TUGAS BESAR 2 - Geometric and Linear Agebra IF2123
+Bandung Institute of Technology
+```
+
 ## Table of Contents
 - [General Info](#general-information)
 - [Technologies Used](#technologies-used)
@@ -18,6 +23,7 @@ Kelompok algeogeogeo:
 - [Installation](#installation)
 
 ## General Information
+This is an Image Compression Program using SVD (Singular Value Decomposition) algorithm built with flask python and vue.js. With image compression, we can reduce image file size without significantly affecting the image quality. The SVD algorithm is a decomposition of a matrix into an orthogonal matrix U, a diagonal matrix S, and a transpose of an orthogonal matrix V. In this program, we use QR Iteration to get the reconstructed SVD matrix.
 
 ## Technologies Used
 - [Vue 3.0.0](https://vuejs.org/)
@@ -55,7 +61,16 @@ A Flask view is used to serve the index.html as an entry point into the Vue app 
 | `/test`              | Image for testing purposes                 |
 
 ## Screenshots
-
+- Image with RGB Mode
+![Screenshot](doc/screenshot/Picture1.png)
+- Image with RGBA Mode
+![Screenshot](doc/screenshot/Picture2.png)
+- Image with P and CMYK Mode
+![Screenshot](doc/screenshot/Picture3.png)
+- Image with L and LA Mode
+![Screenshot](doc/screenshot/Picture4.png)
+- Images with large dimensions
+![Screenshot](doc/screenshot/Picture5.png)
 ## Installation
 #### Before you start <br><br>
 Before getting started, you should have the following installed and running:
